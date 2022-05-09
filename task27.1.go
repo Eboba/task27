@@ -14,23 +14,25 @@ type Student struct {
 	Grade int
 }
 
-var studentMap = map[string]Student{} //глобальная мапа(походу сразу инициализированная:))
+type ptu struct {
+	studentMap map[string]Student
+}
 
-func newStudent(text string) { // функция заполняет поля структуры студент
-	s := Student{}
-	arr := strings.Split(text, " ") //строку делим на срез по пробелу
+func newStudent(text string) (s Student) { // функция заполняет поля структуры студент
+	// s = Student{}
+	arr := strings.Split(text, " ") //строку делем на срез по пробелу
 	s.Name = arr[0]
 	s.Age, _ = strconv.Atoi(arr[1])
 	s.Grade, _ = strconv.Atoi(arr[2])
-	s.putMap() //структура уходит в мапу через метод put
+	return
 }
 
-func (s Student) putMap() { // метод добавление в мапу
-	studentMap[s.Name] = s
+func (p ptu) putMap(s Student) { // метод добавление в мапу
+	p.studentMap[s.Name] = s
 }
 
-func (s Student) getMap() { // метод считывание с мапы
-	fmt.Println(s.Name, s.Age, s.Grade)
+func (p ptu) getMap(k string) { // метод считывание с мапы
+	fmt.Println(p.studentMap[k])
 }
 
 func main() {
@@ -38,24 +40,23 @@ func main() {
 	fmt.Println("")
 	fmt.Println("Задание 1. Научиться работать с композитными типами данных: структурами и картами.")
 	fmt.Println("------------")
-
+	m := ptu{}
+	m.studentMap = make(map[string]Student)
 	var input = bufio.NewScanner(os.Stdin)
 
 	fmt.Println("Введите данные студентов:")
 	for input.Scan() { //Цикл который прерывается при EOF
-		studentData := input.Text() //Получаем бесконечные строки
-		newStudent(studentData)     //Строки кидаем в функцию newStudent, вывод который летит в метод добавленияв мапу
-
+		studentData := input.Text()       //Получаем бесконечные строки
+		m.putMap(newStudent(studentData)) //Строки кидаем в фукцию newStudent, вывод который летит в метод добавленияв мапу
 	}
 	if err := input.Err(); err != nil {
 		return
-
 	}
 
 	fmt.Println()
 	fmt.Println("Студенты из хранилища:")
 	fmt.Println("------------")
-	for _, v := range studentMap {
-		v.getMap()
+	for k, _ := range m.studentMap {
+		m.getMap(k)
 	}
 }

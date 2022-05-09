@@ -32,7 +32,7 @@ func (p ptu) putMap(s Student) { // метод добавление в мапу
 }
 
 func (p ptu) getMap(k string) { // метод считывание с мапы
-	fmt.Println(p.studentMap[k])
+	fmt.Println(p.studentMap[k].Name, p.studentMap[k].Age, p.studentMap[k].Grade)
 }
 
 func main() {

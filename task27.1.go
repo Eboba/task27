@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -19,8 +20,7 @@ type ptu struct {
 }
 
 func newStudent(text string) (s Student) { // функция заполняет поля структуры студент
-	// s = Student{}
-	arr := strings.Split(text, " ") //строку делем на срез по пробелу
+	arr := strings.Split(text, " ") //строку делим на срез по пробелу
 	s.Name = arr[0]
 	s.Age, _ = strconv.Atoi(arr[1])
 	s.Grade, _ = strconv.Atoi(arr[2])
@@ -28,11 +28,17 @@ func newStudent(text string) (s Student) { // функция заполняет 
 }
 
 func (p ptu) putMap(s Student) { // метод добавление в мапу
-	p.studentMap[s.Name] = s
+	_, ok := p.studentMap[s.Name]
+	if ok {
+		fmt.Println(errors.New("Имя уже существует"))
+		return
+	} else {
+		p.studentMap[s.Name] = s
+	}
 }
 
-func (p ptu) getMap(k string) { // метод считывание с мапы
-	fmt.Println(p.studentMap[k].Name, p.studentMap[k].Age, p.studentMap[k].Grade)
+func (p ptu) getMap(k string) Student { // метод считывание с мапы
+	return p.studentMap[k]
 }
 
 func main() {
@@ -40,14 +46,17 @@ func main() {
 	fmt.Println("")
 	fmt.Println("Задание 1. Научиться работать с композитными типами данных: структурами и картами.")
 	fmt.Println("------------")
+
 	m := ptu{}
 	m.studentMap = make(map[string]Student)
+	sliceName := make([]string, 0)
 	var input = bufio.NewScanner(os.Stdin)
 
 	fmt.Println("Введите данные студентов:")
 	for input.Scan() { //Цикл который прерывается при EOF
-		studentData := input.Text()       //Получаем бесконечные строки
-		m.putMap(newStudent(studentData)) //Строки кидаем в фукцию newStudent, вывод который летит в метод добавленияв мапу
+		studentData := input.Text()                                   //Получаем бесконечные строки
+		m.putMap(newStudent(studentData))                             //Строки кидаем в фукцию newStudent, вывод, который летит в метод добавления в мапу
+		sliceName = append(sliceName, strings.Fields(studentData)[0]) // Добавляем имя в разрез
 	}
 	if err := input.Err(); err != nil {
 		return
@@ -56,7 +65,7 @@ func main() {
 	fmt.Println()
 	fmt.Println("Студенты из хранилища:")
 	fmt.Println("------------")
-	for k, _ := range m.studentMap {
-		m.getMap(k)
+	for _, k := range sliceName {
+		fmt.Println(m.getMap(k).Name, m.getMap(k).Age, m.getMap(k).Grade)
 	}
 }
